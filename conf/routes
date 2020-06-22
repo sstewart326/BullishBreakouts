@@ -1,0 +1,14 @@
+
+# Routes
+
+GET     /health                     com.bullish.breakouts.web.controllers.BBController.health
+
+POST    /alert                      com.bullish.breakouts.web.controllers.BBController.alert
+
+PUT     /uploadImage                com.bullish.breakouts.web.controllers.BBController.uploadImage
+
+GET     /charts/page/:pageNum       com.bullish.breakouts.web.controllers.BBController.chartsMeta( pageNum )
+
+GET    /charts/:image               com.bullish.breakouts.web.controllers.BBController.fetchImage( image )
+
+      
