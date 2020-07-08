@@ -1,9 +1,9 @@
 package com.bullish.breakouts.web.controllers
 
 import com.bullish.breakouts.config.Properties
-import com.bullish.breakouts.domain.AlertRequest
+import com.bullish.breakouts.domain.{AlertRequest, ChartMeta}
 import com.bullish.breakouts.services.{CloudService, TextService}
-import com.bullish.breakouts.web.action.UserAction
+import com.bullish.breakouts.web.action.{AdminAction, UserAction}
 import com.typesafe.config.ConfigFactory
 import javax.inject.Inject
 import play.api.Logging
@@ -25,7 +25,8 @@ import scala.util.Try
 class BBController @Inject()(cc: ControllerComponents,
                              textService: TextService,
                              cloudService: CloudService,
-                             userAction: UserAction
+                             userAction: UserAction,
+                             adminAction: AdminAction
                             )(implicit exec: ExecutionContext) extends AbstractController(cc) with Logging {
 
   val config = ConfigFactory.load()
@@ -54,26 +55,30 @@ class BBController @Inject()(cc: ControllerComponents,
     imageFut.map( Ok.sendFile(_).as( "image/png" ) )
   }
 
-  //TODO admin action
-  def uploadImage = userAction.async(parse.multipartFormData) { implicit request =>
-    val fileUploaded = request.body.file( "chart" ).map( file =>
-       cloudService.uploadImage( Properties.bucketName, file.filename, file.ref.toFile ) )
+  def uploadImage = adminAction.async(parse.multipartFormData) { implicit request =>
+    val nameFormat = "[A-Z]+_[0-9]{4}-[0-9]{2}-[0-9]{2}.*".r
+    val fileUploaded = request.body.file("chart")
+      .filter( file => nameFormat.matches(file.filename) )
+      .map( file => {
+        val meta = ChartMeta(Properties.bucketName, file.filename)
+        cloudService.uploadImage(file.ref.toFile, meta)
+      })
     fileUploaded.getOrElse( Future{ false } ).map( uploaded => {
       if ( uploaded ) Ok( "uploaded" )
       else InternalServerError( "failed to upload" )
     })
   }
 
-  def chartsMeta( pageNum: String ) = userAction.async { implicit  request =>
+  def chartsMeta( pageNum: String, numToFetch: String ) = userAction.async { implicit  request =>
     val maybePageNum = Try( pageNum.toInt ).toOption
-    maybePageNum match {
-      case Some( pageNum ) => {
-        val chartsMetaFut = cloudService.fetchChartsMeta( Properties.bucketName, pageNum )
+    val maybeNumToFetch = Try( numToFetch.toInt ).toOption
+    (maybePageNum, maybeNumToFetch) match {
+      case ( Some(pageNum), Some(numToFetch) )=> {
+        val chartsMetaFut = cloudService.fetchChartsMeta( Properties.bucketName, pageNum, numToFetch )
         chartsMetaFut.map( meta => Ok( Json.toJson(meta) ).withHeaders( ("Access-Control-Allow-Origin", "http://localhost:4200") ) )
       }
       case _ => Future{ BadRequest }
     }
-
   }
 
 }

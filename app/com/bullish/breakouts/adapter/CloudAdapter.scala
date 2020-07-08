@@ -3,6 +3,7 @@ package com.bullish.breakouts.adapter
 import java.io.File
 
 import com.bullish.breakouts.adapter.aws.AWSAdapter
+import com.bullish.breakouts.domain.ImageMeta
 import com.google.inject.ImplementedBy
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,7 +13,7 @@ trait CloudAdapter {
 
   def listBuckets(): Seq[String]
 
-  def uploadImage( bucket: String, path: String, image: File )( implicit ec: ExecutionContext ): Future[Boolean]
+  def uploadImage( image: File, meta: ImageMeta )(implicit ec: ExecutionContext ): Future[Boolean]
 
   def fetchChartMeta( bucket: String )( implicit ec:ExecutionContext ): Future[Vector[String]]
 

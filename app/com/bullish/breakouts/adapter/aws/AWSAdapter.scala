@@ -1,15 +1,17 @@
 package com.bullish.breakouts.adapter.aws
 
-import java.io.File
+import java.io.{File, FileInputStream}
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.bullish.breakouts.adapter.CloudAdapter
 import com.bullish.breakouts.config.Properties
+import com.bullish.breakouts.domain.ImageMeta
 import org.apache.commons.io.FileUtils
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -25,13 +27,13 @@ class AWSAdapter extends CloudAdapter {
     .withRegion(Regions.US_EAST_1)
     .build()
 
-  override def listBuckets: Seq[String] = {
-    s3client.listBuckets().asScala.map( _.getName )
+  override def listBuckets(): Seq[String] = {
+    s3client.listBuckets().asScala.map( _.getName ).toList
   }
 
-  override def uploadImage(bucket: String, path: String, image: File)( implicit ec: ExecutionContext ): Future[Boolean] = {
+  override def uploadImage( image: File, imageMeta: ImageMeta )( implicit ec: ExecutionContext ): Future[Boolean] = {
     Future {
-      s3client.putObject(bucket, path, image)
+      s3client.putObject(imageMeta.bucketName, imageMeta.fileName, image)
       true
     }
   }

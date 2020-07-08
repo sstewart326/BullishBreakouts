@@ -3,7 +3,7 @@ package com.bullish.breakouts.services.impl
 import java.io.File
 
 import com.bullish.breakouts.adapter.CloudAdapter
-import com.bullish.breakouts.domain.{ChartsMeta, ChartsMetaResponse}
+import com.bullish.breakouts.domain.{ChartsMeta, ChartsMetaResponse, ImageMeta}
 import com.bullish.breakouts.services.CloudService
 import javax.inject.Inject
 import play.api.Logging
@@ -17,47 +17,66 @@ class CloudServiceImpl @Inject()(cloudAdapter: CloudAdapter,
   def imageMetaCacheKey( bucket: String ) = s"imagemeta-$bucket"
   def imageCacheKey( bucket: String, key: String ) = s"image-$bucket-$key"
 
-  override def uploadImage( bucket: String, path: String, image: File )( implicit ec: ExecutionContext ): Future[Boolean] = {
-    val uploadedFut = cloudAdapter.uploadImage( bucket, path, image )
+  override def uploadImage( image: File, imageMeta: ImageMeta )(implicit ec: ExecutionContext ): Future[Boolean] = {
+    val uploadedFut = cloudAdapter.uploadImage( image, imageMeta )
     uploadedFut.map( uploaded => {
       if ( uploaded ) {
-        cache.remove( imageMetaCacheKey( bucket ) )
+        cache.remove( imageMetaCacheKey( imageMeta.bucketName ) )
         uploaded
       }
       else uploaded
     })
   }
 
-  override def fetchChartsMeta( bucket: String, pageNum: Int )( implicit ec: ExecutionContext ): Future[ChartsMetaResponse] = {
+  override def fetchChartsMeta( bucket: String, pageNum: Int, numToFetch: Int )( implicit ec: ExecutionContext ): Future[ChartsMetaResponse] = {
 
     def slice( meta: Vector[String] ) = {
-      val MaxPerPage = 10
       val chartStart = {
-        val start = (pageNum * MaxPerPage) - MaxPerPage - 1
+        val start = (pageNum * numToFetch) - numToFetch - 1
         if ( start < 0 ) 0
         else start
       }
       val chartEnd =
-        if ( meta.size - 1 >= chartStart + MaxPerPage ) chartStart + MaxPerPage
-        else meta.size - 1
-      meta.slice( chartStart, chartEnd )
+        if ( meta.size - 1 >= chartStart + numToFetch ) chartStart + numToFetch
+        else meta.size
+      meta.slice(chartStart, chartEnd)
     }
 
-    def buildResponse( meta: Vector[String] ) = {
-      ChartsMetaResponse( meta.map( ChartsMeta(_) ) )
+    def buildResponse( chartsMeta: Vector[String] ) = {
+      val tickerFormat = "[A-Z]+".r
+      val dateFormat = "[0-9]{4}-[0-9]{2}-[0-9]{2}".r
+      val key = slice(chartsMeta)
+      val meta = key.map( key => {
+        val tickerOpt = tickerFormat.findFirstIn(key)
+        val dateOpt = dateFormat.findFirstIn(key)
+        (tickerOpt, dateOpt) match {
+          case ( Some(ticker), Some(date) ) => Some( ChartsMeta(key, ticker, date) )
+          case _ => {
+            logger.error(s"Invalid key format: $key")
+            None
+          }
+        }
+      }).flatten
+
+      ChartsMetaResponse(meta, meta.size)
     }
 
     cache.get[Vector[String]]( imageMetaCacheKey( bucket ) ).flatMap( entry => entry match {
       case Some( chartsMeta ) => {
         logger.info( s"Found cached entry for key ${imageMetaCacheKey( bucket )}" )
-        Future { buildResponse( slice(chartsMeta) ) }
+        Future { buildResponse( chartsMeta ) }
       }
       case _ => {
         logger.info( "Cache miss. Fetching image meta..." )
         val imageMetaFut = cloudAdapter.fetchChartMeta( bucket )
         imageMetaFut.map { meta =>
-          cache.set( imageMetaCacheKey( bucket ), meta )
-          buildResponse( slice(meta) )
+          if(meta.size == 0) {
+            logger.warn("There was no image to fetch")
+            buildResponse(Vector.empty)
+          } else {
+            cache.set( imageMetaCacheKey( bucket ), meta )
+            buildResponse( meta )
+          }
         }
       }
     })

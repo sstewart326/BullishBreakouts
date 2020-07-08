@@ -13,5 +13,6 @@ object Properties {
   val awsSecret        = config.getString( "aws.secret" )
 
   val bucketName       = "bullish-breakouts"
+  val adminPswd        = "pswd"
 
 }
