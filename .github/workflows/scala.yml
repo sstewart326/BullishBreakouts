@@ -22,7 +22,7 @@ jobs:
           echo ${{ secrets.DOCKER_USER }} > DOCKER_USER
           echo ${{ secrets.DOCKER_PASS }} > DOCKER_PASS
     - name: Docker login
-      run: docker login -u $(cat DOCKER_USER) --password-stdin $(cat DOCKER_PASS)
+      run: docker login -u $(cat DOCKER_USER) -p $(cat DOCKER_PASS)
     - name: Build
       run: sbt clean compile dist
     - name: Docker Build
