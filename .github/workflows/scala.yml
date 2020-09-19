@@ -17,10 +17,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Set environment variables
+        uses: allenevans/set-env@v1.0.0
+        with:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }} 
     - name: Docker login
-      env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER }}
-        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
       run: docker login -u $DOCKER_USER -p $DOCKER_PASS
     - name: Build
       run: sbt clean compile dist
