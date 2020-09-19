@@ -25,6 +25,6 @@ jobs:
     - name: Build
       run: sbt clean compile dist
     - name: Docker Build
-      run: docker build -t bullish-breakouts ./
+      run: docker build -t sstewart326/bullish-breakouts:latest ./
     - name: Docker push
-      run: docker push $DOCKER_USER/bullish-breakouts
+      run: docker push sstewart326/bullish-breakouts:latest
