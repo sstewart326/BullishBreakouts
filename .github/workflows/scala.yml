@@ -27,4 +27,4 @@ jobs:
     - name: Docker Build
       run: docker build -t bullish-breakouts ./
     - name: Docker push
-      run: docker push bullish-breakouts
+      run: docker push $DOCKER_USER/bullish-breakouts
