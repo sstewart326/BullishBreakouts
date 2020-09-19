@@ -3,12 +3,12 @@
 
 GET     /health                                       com.bullish.breakouts.web.controllers.BBController.health
 
-POST    /alert                                        com.bullish.breakouts.web.controllers.BBController.alert
+POST    /admin/alert                                  com.bullish.breakouts.web.controllers.BBController.alert
 
-PUT     /uploadImage                                  com.bullish.breakouts.web.controllers.BBController.uploadImage
+POST    /admin/uploadImage                           com.bullish.breakouts.web.controllers.BBController.uploadImage
 
 GET     /charts/page/:pageNum/fetch/:numToFetch       com.bullish.breakouts.web.controllers.BBController.chartsMeta( pageNum, numToFetch )
 
-GET    /charts/:image                                 com.bullish.breakouts.web.controllers.BBController.fetchImage( image )
+GET     /charts/:image                                com.bullish.breakouts.web.controllers.BBController.fetchImage( image )
 
       

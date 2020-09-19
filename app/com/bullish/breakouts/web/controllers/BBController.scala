@@ -6,7 +6,7 @@ import com.bullish.breakouts.services.{CloudService, TextService}
 import com.bullish.breakouts.web.action.{AdminAction, UserAction}
 import com.typesafe.config.ConfigFactory
 import javax.inject.Inject
-import play.api.Logging
+import play.api.{Configuration, Logging}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
@@ -33,7 +33,7 @@ class BBController @Inject()(cc: ControllerComponents,
 
   def health = Action { Ok( "Working" ) }
 
-  def alert = userAction.async(parse.json) { implicit request =>
+  def alert = adminAction.async(parse.json) { implicit request =>
     request.body.validate[AlertRequest].fold(
 
       _ => {
@@ -75,7 +75,8 @@ class BBController @Inject()(cc: ControllerComponents,
     (maybePageNum, maybeNumToFetch) match {
       case ( Some(pageNum), Some(numToFetch) )=> {
         val chartsMetaFut = cloudService.fetchChartsMeta( Properties.bucketName, pageNum, numToFetch )
-        chartsMetaFut.map( meta => Ok( Json.toJson(meta) ).withHeaders( ("Access-Control-Allow-Origin", "http://localhost:4200") ) )
+        val allowedOrigin = Properties.allowedOrigin.getOrElse( "https://" + request.host )
+        chartsMetaFut.map( meta => Ok( Json.toJson(meta) ).withHeaders( ("Access-Control-Allow-Origin", allowedOrigin) ) )
       }
       case _ => Future{ BadRequest }
     }

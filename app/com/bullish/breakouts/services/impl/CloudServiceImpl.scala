@@ -44,7 +44,7 @@ class CloudServiceImpl @Inject()(cloudAdapter: CloudAdapter,
 
     def buildResponse( chartsMeta: Vector[String] ) = {
       val tickerFormat = "[A-Z]+".r
-      val dateFormat = "[0-9]{4}-[0-9]{2}-[0-9]{2}".r
+      val dateFormat = "[0-9]{2}-[0-9]{2}-[0-9]{4}".r
       val key = slice(chartsMeta)
       val meta = key.map( key => {
         val tickerOpt = tickerFormat.findFirstIn(key)
