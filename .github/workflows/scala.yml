@@ -18,15 +18,14 @@ jobs:
       with:
         java-version: 1.8
     - name: Set environment variables
-        uses: allenevans/set-env@v1.0.0
-        with:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }} 
+      run: |
+          echo ${{ secrets.DOCKER_USER }} > DOCKER_USER
+          echo ${{ secrets.DOCKER_PASS }} > DOCKER_PASS
     - name: Docker login
-      run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      run: docker login -u $(cat DOCKER_USER) -p $(cat DOCKER_PASS)
     - name: Build
       run: sbt clean compile dist
     - name: Docker Build
-      run: docker build -t $DOCKER_USER/bullish-breakouts:latest ./
+      run: docker build -t $(cat DOCKER_USER)/bullish-breakouts:latest ./
     - name: Docker push
-      run: docker push $DOCKER_USER/bullish-breakouts:latest
+      run: docker push $(cat DOCKER_USER)/bullish-breakouts:latest
