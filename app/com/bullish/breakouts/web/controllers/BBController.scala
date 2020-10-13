@@ -56,7 +56,7 @@ class BBController @Inject()(cc: ControllerComponents,
   }
 
   def uploadImage = adminAction.async(parse.multipartFormData) { implicit request =>
-    val nameFormat = "[A-Z]+_[0-9]{4}-[0-9]{2}-[0-9]{2}.*".r
+    val nameFormat = "[A-Z]+_[0-9]{2}-[0-9]{2}-[0-9]{4}.*".r
     val fileUploaded = request.body.file("chart")
       .filter( file => nameFormat.matches(file.filename) )
       .map( file => {

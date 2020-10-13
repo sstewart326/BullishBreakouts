@@ -11,7 +11,8 @@ object Properties {
   val twilioNumber: String     = config.getString( "twilio.from_number" )
   val awsAccessKey: String     = config.getString( "aws.access_key" )
   val awsSecret: String        = config.getString( "aws.secret" )
-  val bucketName: String       = "bullish-breakouts"
+  val projectId: String        = "bullish-breakouts"
+  val bucketName: String       = "bullish-breakouts-charts"
   val adminPswd: String        = "pswd"
   val allowedOrigin: Option[String] = {
     if ( config.hasPath("allowed.origin") )

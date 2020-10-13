@@ -2,13 +2,13 @@ package com.bullish.breakouts.adapter
 
 import java.io.File
 
-import com.bullish.breakouts.adapter.aws.AWSAdapter
+import com.bullish.breakouts.adapter.gcp.GCPAdapter
 import com.bullish.breakouts.domain.ImageMeta
 import com.google.inject.ImplementedBy
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[AWSAdapter])
+@ImplementedBy(classOf[GCPAdapter])
 trait CloudAdapter {
 
   def listBuckets(): Seq[String]
