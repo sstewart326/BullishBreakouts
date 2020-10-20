@@ -1,7 +1,7 @@
 
 # Routes
 
-GET     /api                                             com.bullish.breakouts.web.controllers.BBController.health
+GET     /api/health                                      com.bullish.breakouts.web.controllers.BBController.health
 
 POST    /api/admin/alert                                 com.bullish.breakouts.web.controllers.BBController.alert
 
