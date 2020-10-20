@@ -32,7 +32,7 @@ class TwilioAdapter extends MessagingAdapter with Logging {
     val responses =
       toNumbers.map( num => {
         val to = new PhoneNumber( num )
-        val from = new PhoneNumber( Properties.twilioNumber )
+        val from = new PhoneNumber( Properties.twilioNumber.getOrElse( throw new UnsupportedOperationException() ) )
         create( to, from )
       })
     Future.sequence( responses ).map( _.forall(_ == true) )

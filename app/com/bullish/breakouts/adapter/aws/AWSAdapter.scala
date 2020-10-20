@@ -18,8 +18,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AWSAdapter extends CloudAdapter {
 
   val credentials = new BasicAWSCredentials(
-    Properties.awsAccessKey,
-    Properties.awsSecret
+    Properties.awsAccessKey.getOrElse( throw new UnsupportedOperationException() ),
+    Properties.awsSecret.getOrElse( throw new UnsupportedOperationException() )
   )
 
   val s3client = AmazonS3ClientBuilder.standard()
