@@ -1,14 +1,14 @@
 
 # Routes
 
-GET     /api/health                                       com.bullish.breakouts.web.controllers.BBController.health
+GET     /api                                             com.bullish.breakouts.web.controllers.BBController.health
 
-POST    /api/admin/alert                                  com.bullish.breakouts.web.controllers.BBController.alert
+POST    /api/admin/alert                                 com.bullish.breakouts.web.controllers.BBController.alert
 
 POST    /api/admin/uploadImage                           com.bullish.breakouts.web.controllers.BBController.uploadImage
 
-GET     /api/charts/page/:pageNum/fetch/:numToFetch       com.bullish.breakouts.web.controllers.BBController.chartsMeta( pageNum, numToFetch )
+GET     /api/charts/page/:pageNum/fetch/:numToFetch      com.bullish.breakouts.web.controllers.BBController.chartsMeta( pageNum, numToFetch )
 
-GET     /api/charts/:image                                com.bullish.breakouts.web.controllers.BBController.fetchImage( image )
+GET     /api/charts/:image                               com.bullish.breakouts.web.controllers.BBController.fetchImage( image )
 
       
