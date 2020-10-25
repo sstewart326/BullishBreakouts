@@ -6,6 +6,6 @@ RUN unzip bullishbreakouts-1.0.zip
 
 WORKDIR bullishbreakouts-1.0
 
-EXPOSE 2900
+EXPOSE 9000
 
 CMD ["bin/bullishbreakouts"]
