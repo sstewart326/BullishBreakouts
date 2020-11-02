@@ -31,7 +31,7 @@ class BBController @Inject()(cc: ControllerComponents,
 
   val config = ConfigFactory.load()
 
-  def health = Action { Ok( "Working" ) }
+  def health = Action { Ok }
 
   def alert = adminAction.async(parse.json) { implicit request =>
     request.body.validate[AlertRequest].fold(
