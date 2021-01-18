@@ -11,8 +11,8 @@ object Properties {
   val twilioNumber: Option[String]     = getString( "twilio.from_number" )
   val awsAccessKey: Option[String]     = getString( "aws.access_key" )
   val awsSecret: Option[String]        = getString( "aws.secret" )
-  val projectId: String                = "bullish-breakouts"
-  val bucketName: String               = "bullish-breakouts-charts"
+  val projectId: String                = "breaking-bulls"
+  val bucketName: String               = "breaking-bulls-charts"
   val adminPswd: String                = "pswd"
   val allowedOrigin: Option[String] = getString( "allowed.origin" )
 
